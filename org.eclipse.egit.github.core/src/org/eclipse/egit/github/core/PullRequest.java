@@ -83,6 +83,14 @@ public class PullRequest implements Serializable {
 
 	private User user;
 
+	private String commitsUrl;
+
+	private String reviewCommentsUrl;
+
+	private String commentsUrl;
+
+	private String statusesUrl;
+
 	/**
 	 * @return mergeable
 	 */
@@ -563,6 +571,62 @@ public class PullRequest implements Serializable {
 	public PullRequest setAssignee(User assignee) {
 		this.assignee = assignee;
 		return this;
+	}
+
+	/**
+	 * @return the commitsUrl
+	 */
+	public String getCommitsUrl() {
+		return commitsUrl;
+	}
+
+	/**
+	 * @param commitsUrl the commitsUrl to set
+	 */
+	public void setCommitsUrl(String commitsUrl) {
+		this.commitsUrl = commitsUrl;
+	}
+
+	/**
+	 * @return the reviewCommentsUrl
+	 */
+	public String getReviewCommentsUrl() {
+		return reviewCommentsUrl;
+	}
+
+	/**
+	 * @param reviewCommentsUrl the reviewCommentsUrl to set
+	 */
+	public void setReviewCommentsUrl(String reviewCommentsUrl) {
+		this.reviewCommentsUrl = reviewCommentsUrl;
+	}
+
+	/**
+	 * @return the commentsUrl
+	 */
+	public String getCommentsUrl() {
+		return commentsUrl;
+	}
+
+	/**
+	 * @param commentsUrl the commentsUrl to set
+	 */
+	public void setCommentsUrl(String commentsUrl) {
+		this.commentsUrl = commentsUrl;
+	}
+
+	/**
+	 * @return the statusesUrl
+	 */
+	public String getStatusesUrl() {
+		return statusesUrl;
+	}
+
+	/**
+	 * @param statusesUrl the statusesUrl to set
+	 */
+	public void setStatusesUrl(String statusesUrl) {
+		this.statusesUrl = statusesUrl;
 	}
 
 	@Override
