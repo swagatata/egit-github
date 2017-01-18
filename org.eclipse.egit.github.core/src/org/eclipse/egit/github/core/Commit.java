@@ -37,6 +37,8 @@ public class Commit implements Serializable {
 
 	private Tree tree;
 
+	private Verification verification;
+
 	/**
 	 * @return author
 	 */
@@ -163,5 +165,19 @@ public class Commit implements Serializable {
 	public Commit setTree(Tree tree) {
 		this.tree = tree;
 		return this;
+	}
+
+	/**
+	 * @return the verification
+	 */
+	public Verification getVerification() {
+		return verification;
+	}
+
+	/**
+	 * @param verification the verification to set
+	 */
+	public void setVerification(Verification verification) {
+		this.verification = verification;
 	}
 }

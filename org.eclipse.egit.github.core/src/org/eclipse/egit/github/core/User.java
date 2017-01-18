@@ -15,6 +15,9 @@ import java.util.Date;
 
 import org.eclipse.egit.github.core.util.DateUtils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 /**
  * GitHub user model class.
  */
@@ -32,6 +35,8 @@ public class User implements Serializable {
 	 * TYPE_ORG
 	 */
 	public static final String TYPE_ORG = "Organization"; //$NON-NLS-1$
+
+	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	private boolean hireable;
 
@@ -485,5 +490,9 @@ public class User implements Serializable {
 	public User setPlan(UserPlan plan) {
 		this.plan = plan;
 		return this;
+	}
+
+	public String toString() {
+		return gson.toJson(this);
 	}
 }

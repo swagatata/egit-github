@@ -16,10 +16,9 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_FILES
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_MERGE;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_PULLS;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS;
+import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REVIEWS;
 import static org.eclipse.egit.github.core.client.PagedRequest.PAGE_FIRST;
 import static org.eclipse.egit.github.core.client.PagedRequest.PAGE_SIZE;
-
-import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -34,10 +33,13 @@ import org.eclipse.egit.github.core.MergeStatus;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.PullRequestMarker;
 import org.eclipse.egit.github.core.RepositoryCommit;
+import org.eclipse.egit.github.core.Review;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.client.GitHubRequest;
 import org.eclipse.egit.github.core.client.PageIterator;
 import org.eclipse.egit.github.core.client.PagedRequest;
+
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Service class for creating, updating, getting, and listing pull requests as
@@ -551,4 +553,49 @@ public class PullRequestService extends GitHubService {
 		uri.append('/').append(commentId);
 		client.delete(uri.toString());
 	}
+
+
+	/**
+	 * Get an issue's reviews
+	 *
+	 * @param user
+	 * @param repository
+	 * @param issueNumber
+	 * @return list of reviews
+	 * @throws IOException
+	 */
+	public List<Review> getReviews(String user, String repository,
+			String issueNumber) throws IOException {
+		verifyRepository(user, repository);
+		String repoId = user + '/' + repository;
+		return getReviews(repoId, issueNumber);
+	}
+
+	/**
+	 * Get an issue's reviews
+	 *
+	 * @param repository
+	 * @param issueNumber
+	 * @return list of reviews
+	 * @throws IOException
+	 */
+	private List<Review> getReviews(String repoId, String issueNumber)
+			throws IOException {
+		if (issueNumber == null)
+			throw new IllegalArgumentException("Issue number cannot be null"); //$NON-NLS-1$
+		if (issueNumber.length() == 0)
+			throw new IllegalArgumentException("Issue number cannot be empty"); //$NON-NLS-1$
+
+		StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
+		uri.append('/').append(repoId);
+		uri.append(SEGMENT_PULLS);
+		uri.append('/').append(issueNumber);
+		uri.append(SEGMENT_REVIEWS);
+		PagedRequest<Review> request = createPagedRequest();
+		request.setUri(uri);
+		request.setType(new TypeToken<List<Review>>() {
+		}.getType());
+		return getAll(request);
+	}
+
 }
