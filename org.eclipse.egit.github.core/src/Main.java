@@ -1,13 +1,10 @@
 import java.io.IOException;
 import java.util.List;
 
-import org.eclipse.egit.github.core.Commit;
-import org.eclipse.egit.github.core.IRepositoryIdProvider;
-import org.eclipse.egit.github.core.PullRequest;
-import org.eclipse.egit.github.core.RepositoryCommit;
-import org.eclipse.egit.github.core.Review;
+import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.CommitService;
+import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.PullRequestService;
 
 public class Main {
@@ -19,11 +16,18 @@ public class Main {
 
 		client.setOAuth2Token("352b9aaefe815667b8555164ac8225476e931e40");
 
+        String commitId = "dba934795d90a8b89b848f79f8411f94b4a9ac91";
+        final String userName = "harsh-groverfk";
+        final String repo = "jenkins-demo";
+
+        String pull_request_id = getPullRequestFromCommitID(userName, repo, commitId);
+        System.out.println("Pull request of commit '" + commitId + "' is id: " + pull_request_id);
 
 		Review approval = null;
 		try {
-			approval = getPullRequestApproval("harsh-groverfk", "jenkins-demo", "16");
-		} catch (NumberFormatException | IOException e) {
+			approval = getPullRequestApproval(userName, repo, pull_request_id);
+//		} catch (NumberFormatException | IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -51,10 +55,43 @@ public class Main {
 
 			@Override
 			public String generateId() {
-				return "dan13ram/Graph";
+                return userName + "/" + repo;
 			}
 		}, "master");
 	}
+
+    private static String getPullRequestFromCommitID(final String user, final String repo, String commitID) {
+        CommitService commitService = new CommitService(client);
+        IssueService issueService = new IssueService(client);
+
+        try {
+            RepositoryCommit repositoryCommit = commitService.getCommit(new IRepositoryIdProvider() {
+                public String generateId() {
+                    return user + "/" + repo;
+                }
+            }, commitID);
+            List<Commit> parents = repositoryCommit.getParents();
+            Commit pr_commit = null;
+            if (parents.size() != 2) {
+                return null;
+            } else {
+                pr_commit = parents.get(1);
+            }
+            if (pr_commit != null) {
+                SearchIssue searchIssue = issueService.searchIssues(new IRepositoryIdProvider() {
+                    public String generateId() {
+                        return user + "/" + repo;
+                    }
+                }, "closed", pr_commit.getSha()).get(0);
+
+                System.out.println(searchIssue.toString());
+                return String.valueOf(searchIssue.getNumber());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 	private static boolean verifyLatestMasterCommit(IRepositoryIdProvider iRepositoryIdProvider, String branch) {
 		client.setHeaderAccept("application/vnd.github.cryptographer-preview");
@@ -107,7 +144,7 @@ public class Main {
 		return repoCommits;
 	}
 
-	private static Review getPullRequestApproval(String user, String repo, String id) throws NumberFormatException, IOException {
+	private static Review getPullRequestApproval(final String user, final String repo, String id) throws NumberFormatException, IOException {
 		client.setHeaderAccept("application/vnd.github.black-cat-preview+json");
 		PullRequestService pr_service = new PullRequestService(client);
 
